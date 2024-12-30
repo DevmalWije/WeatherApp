@@ -64,3 +64,31 @@ enum City: Identifiable, CaseIterable {
     }
 }
 
+struct FavouriteCity: Identifiable, Codable, Equatable {
+    let id = UUID()
+    var cityName: String
+    var latitude: Double
+    var longitude: Double
+
+    // Computed property to get CLLocationCoordinate2D
+    var cityCoordinates: CLLocationCoordinate2D {
+        get {
+            CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+        }
+        set {
+            latitude = newValue.latitude
+            longitude = newValue.longitude
+        }
+    }
+
+    // CodingKeys for custom encoding/decoding
+    enum CodingKeys: String, CodingKey {
+        case id, cityName, latitude, longitude
+    }
+
+    static func == (lhs: FavouriteCity, rhs: FavouriteCity) -> Bool {
+        return lhs.cityName == rhs.cityName &&
+               lhs.latitude == rhs.latitude &&
+               lhs.longitude == rhs.longitude
+    }
+}

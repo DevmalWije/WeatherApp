@@ -28,7 +28,7 @@ struct CurrentWeather: Decodable, Equatable {
     let dew_point: Double
     let uvi: Double
     let clouds: Int
-    let visibility: Int
+    let visibility: Int?
     let wind_speed: Double
     let wind_deg: Int
     let wind_gust: Double?
@@ -83,3 +83,40 @@ struct WeatherCondition: Decodable, Equatable {
     let description: String
     let icon: String
 }
+
+import Foundation
+
+
+struct AirQualityResponse: Codable {
+    let coord: Coord
+    let list: [AirQualityData]
+}
+
+struct Coord: Codable {
+    let lon: Double
+    let lat: Double
+}
+
+// Structure for the air quality data
+struct AirQualityData: Codable {
+    let main: Main
+    let components: Components
+    let dt: TimeInterval
+}
+
+struct Main: Codable {
+    let aqi: Int
+}
+
+// Structure for the components section
+struct Components: Codable {
+    let co: Double
+    let no: Double
+    let no2: Double
+    let o3: Double
+    let so2: Double
+    let pm2_5: Double
+    let pm10: Double
+    let nh3: Double
+}
+
