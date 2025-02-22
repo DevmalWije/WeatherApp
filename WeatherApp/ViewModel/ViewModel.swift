@@ -4,8 +4,8 @@
 //
 //  Created by Devmal Wijesinghe on 2024-12-24.
 //
-
-
+//
+//
 import Foundation
 import CoreLocation
 
@@ -36,11 +36,9 @@ class ViewModel: NSObject,ObservableObject, CLLocationManagerDelegate {
     
     //API call constants
     let APIKey = "841d2244be17c810ea7de37ff784415b"
-    //    let APIKey = "165ee8ce58cbcb684389e7297fd62f91"
     let baseURL = "https://api.openweathermap.org/data/3.0/onecall?"
     let airQualitybaseURL = "https://api.openweathermap.org/data/2.5/air_pollution?"
     
-    //loac
     private let geocoder = CLGeocoder()
     
     override init(){
@@ -108,6 +106,17 @@ class ViewModel: NSObject,ObservableObject, CLLocationManagerDelegate {
         currentUserLocation = location.coordinate
         isLocationAccessGranted = true
         print("Location updated: \(location.coordinate)")
+        currentUserLocation = location.coordinate
+        isLocationAccessGranted = true
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return } // Safely unwrap self
+            self.currentUserLocation = location.coordinate
+            self.isLocationAccessGranted = true
+        }
+        Task {
+            await getCityWeatherFromAPI(coordinate: currentUserLocation!)
+        }
+        print("Location authorized: \(location.coordinate)")
         funcLocationManager.stopUpdatingLocation()
     }
     
@@ -197,6 +206,7 @@ class ViewModel: NSObject,ObservableObject, CLLocationManagerDelegate {
                 self?.locationSearchSuccess = true
             }
             getLocationNameFrom(coordinate: coordinate)
+            
             Task {
                 await self.getCityAirQuality(coordinate: coordinate)
             }
@@ -229,4 +239,3 @@ class ViewModel: NSObject,ObservableObject, CLLocationManagerDelegate {
         }
     }
 }
-

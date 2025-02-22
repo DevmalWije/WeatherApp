@@ -13,6 +13,7 @@ import CoreLocation
 struct ContentView: View {
     @EnvironmentObject var viewModel: ViewModel
     @State private var selectedTab: Tab = .home
+    
 
     var body: some View {
         TabView(selection: $selectedTab) {

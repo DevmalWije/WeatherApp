@@ -16,16 +16,15 @@ struct HomeView: View {
     @State private var isFavorited: Bool = false
     @State private var showingAlert = false
     @State private var alertMessage = ""
-    
     // New state to determine day or night
     @State private var isDayTime: Bool = true
+    //default condition for backdrop
+    @State var weatherConditionName: String = "clear"
     
     var body: some View {
         NavigationStack {
             ZStack {
-                // Background gradient based on day or night
-                let gradientColors = isDayTime ? [Color.teal, Color.blue.opacity(0.7)] : [Color.black, Color.gray]
-                LinearGradient(gradient: Gradient(colors: gradientColors), startPoint: .top, endPoint: .bottom)
+                WeatherVideoPlayerView(videoName:$weatherConditionName)
                     .ignoresSafeArea(.container)
                 
                 ScrollView(.vertical, showsIndicators: false) {
@@ -33,31 +32,40 @@ struct HomeView: View {
                         TextField("Search City", text: $cityName)
                             .textFieldStyle(.roundedBorder)
                             .onSubmit {
-                                viewModel.getCoordinateFrom(address: cityName) { success in
-                                    if success {
-                                        viewModel.locationSearchSuccess = true
-                                    } else {
-                                        alertMessage = "Error getting coordinates, no such city found."
-                                        showingAlert = true
+                                if !cityName.isEmpty{
+                                    viewModel.getCoordinateFrom(address: cityName) { success in
+                                        if success {
+                                            viewModel.locationSearchSuccess = true
+                                        } else {
+                                            alertMessage = "Error getting coordinates, no such city found."
+                                            showingAlert = true
+                                        }
                                     }
+                                }else{
+                                    alertMessage = "Please enter a city name."
+                                    showingAlert = true
+                                    return
                                 }
                             }
-                        Button {
-                            if cityName.isEmpty {
-                                alertMessage = "Please enter a city name."
-                                showingAlert = true
-                                return
+                        if !viewModel.favouriteCities.contains(where: { $0.cityName == viewModel.locationName }){
+                            Button(action: {
+                                if ((((viewModel.locationName?.isEmpty) != nil) || viewModel.currentUserLocation != nil)){
+                                    addToFavouriteCities()
+                                }else{
+                                    alertMessage = "No Location Searched!"
+                                    showingAlert = true
+                                    return
+                                }
+                            }){
+                                Image(systemName: "heart")
                             }
-                            isFavorited.toggle()
-                            if isFavorited {
-                                addToFavouriteCities()
-                            } else {
+                        }else{
+                            Button(action: {
                                 removeFromFavouriteCities()
+                            }){
+                                Image(systemName: "heart.fill")
                             }
-                        } label: {
-                            Label("Favourite", systemImage: isFavorited ? "heart.fill" : "heart")
                         }
-                        .labelStyle(.iconOnly)
                     }
                     .padding(.horizontal)
                     .alert(isPresented: $showingAlert) {
@@ -70,11 +78,12 @@ struct HomeView: View {
                         }
                         Text(viewModel.locationName ?? "Fetching...")
                             .font(.largeTitle)
+                            .multilineTextAlignment(.center)
                         Text(String(format: "%.1f°", viewModel.weatherData?.current.temp ?? 0.0))
                             .shadow(color: .black, radius: 20, x: 3, y: 3)
                             .font(.system(size: 90))
                             .fontWeight(.thin)
-                        Text(String(viewModel.weatherData?.current.weather.first?.description ?? "__"))
+                        Text(String(viewModel.weatherData?.current.weather.first?.description.capitalized ?? "__"))
                             .fontWeight(.semibold)
                             .font(.system(size: 20))
                             .opacity(0.9)
@@ -115,12 +124,7 @@ struct HomeView: View {
                     }
                     .foregroundStyle(.white)
                     .padding()
-                    .background(
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(LinearGradient(gradient: Gradient(colors: [Color.blue, Color.blue.opacity(0.7)]),
-                                                 startPoint: .top, endPoint: .bottom))
-                            .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 5)
-                    )
+                    .background(.ultraThinMaterial).cornerRadius(16)
                     VStack(alignment: .leading, spacing: 2) {
                         HStack {
                             Image(systemName: "calendar")
@@ -157,12 +161,7 @@ struct HomeView: View {
                     }
                     .foregroundStyle(.white)
                     .padding()
-                    .background(
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(LinearGradient(gradient: Gradient(colors: [Color.blue, Color.blue.opacity(0.7)]),
-                                                 startPoint: .top, endPoint: .bottom))
-                            .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 5)
-                    )
+                    .background(.ultraThinMaterial).cornerRadius(16)
                     WeatherGridView()
                     Spacer()
                 }
@@ -170,6 +169,7 @@ struct HomeView: View {
             }
             .onChange(of: viewModel.weatherData?.current.dt) {
                 checkDayNight()
+                updateWeatherCondition()
             }
         }
     }
@@ -186,7 +186,7 @@ struct HomeView: View {
             isDayTime = false
         }
     }
-
+    
     static func formattedHourAndIncrement(from timestamp: TimeInterval, timezoneOffset: Int = 0) -> String {
         let date = Date(timeIntervalSince1970: timestamp)
         let calendar = Calendar.current
@@ -197,7 +197,7 @@ struct HomeView: View {
         dateFormatter.dateFormat = "ha" // 12-hour format with am pm
         return dateFormatter.string(from: newDate)
     }
-
+    
     static func formattedDate(from timestamp: TimeInterval, timezoneOffset: Int = 0) -> String {
         let date = Date(timeIntervalSince1970: timestamp + TimeInterval(timezoneOffset))
         let dateFormatter = DateFormatter()
@@ -227,6 +227,32 @@ struct HomeView: View {
             viewModel.favouriteCities.removeAll( where: { $0.cityName == City.cityName })
         } else {
             isFavorited = false
+        }
+    }
+
+    func updateWeatherCondition() {
+        guard let conditionId = viewModel.weatherData?.current.weather.first?.id else { return }
+        weatherConditionName = weatherCondition(conditionId: conditionId)
+        print("video changes \(weatherConditionName)")
+    }
+    func weatherCondition(conditionId: Int) -> String{
+        switch conditionId{
+        case 200...232:
+            return "thunderstorm"
+        case 300...321:
+            return "drizzle"
+        case 500...531:
+            return "rain"
+        case 600...622:
+            return "snow"
+        case 701...781:
+            return "mist"
+        case 800:
+            return "clear"
+        case 801...804:
+            return "clouds"
+        default:
+            return "clouds"
         }
     }
 }

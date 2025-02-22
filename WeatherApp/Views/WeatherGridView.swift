@@ -123,12 +123,7 @@ struct WeatherGridView: View {
                     .padding()
                 }
                 .gridCellColumns(2)
-                .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(LinearGradient(gradient: Gradient(colors: [Color.blue, Color.blue.opacity(0.7)]),
-                                             startPoint: .top, endPoint: .bottom))
-                        .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 5)
-                )
+                .background(.ultraThinMaterial).cornerRadius(16)
             }
             GridRow{
                 VStack(alignment: .leading, spacing: 8) {
@@ -161,12 +156,7 @@ struct WeatherGridView: View {
                 }
                 .foregroundStyle(.white)
                 .padding()
-                .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(LinearGradient(gradient: Gradient(colors: [Color.blue, Color.blue.opacity(0.7)]),
-                                             startPoint: .top, endPoint: .bottom))
-                        .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 5)
-                )
+                .background(.ultraThinMaterial).cornerRadius(16)
                 VStack(alignment: .leading, spacing: 10) {
                     HStack {
                         Image(systemName: "eye")
@@ -188,12 +178,7 @@ struct WeatherGridView: View {
                     Spacer()
                 }
                 .padding()
-                .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(LinearGradient(gradient: Gradient(colors: [Color.blue, Color.blue.opacity(0.7)]),
-                                             startPoint: .top, endPoint: .bottom))
-                        .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 5)
-                )
+                .background(.ultraThinMaterial).cornerRadius(16)
             }
             // GridRow for Wind Speed and Direction
             GridRow {
@@ -249,12 +234,7 @@ struct WeatherGridView: View {
                     .padding()
                 }
                 .gridCellColumns(2)
-                .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(LinearGradient(gradient: Gradient(colors: [Color.blue, Color.blue.opacity(0.7)]),
-                                             startPoint: .top, endPoint: .bottom))
-                        .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 5)
-                )
+                .background(.ultraThinMaterial).cornerRadius(16)
             }
             //humidity and dew point
             GridRow{
@@ -278,12 +258,7 @@ struct WeatherGridView: View {
                     Spacer()
                 }
                 .padding()
-                .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(LinearGradient(gradient: Gradient(colors: [Color.blue, Color.blue.opacity(0.7)]),
-                                             startPoint: .top, endPoint: .bottom))
-                        .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 5)
-                )
+                .background(.ultraThinMaterial).cornerRadius(16)
                 VStack(alignment: .leading, spacing: 10) {
                     HStack {
                         Image(systemName: "drop.degreesign.fill")
@@ -305,12 +280,7 @@ struct WeatherGridView: View {
                     Spacer()
                 }
                 .padding()
-                .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(LinearGradient(gradient: Gradient(colors: [Color.blue, Color.blue.opacity(0.7)]),
-                                             startPoint: .top, endPoint: .bottom))
-                        .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 5)
-                )
+                .background(.ultraThinMaterial).cornerRadius(16)
             }
             GridRow{
                 VStack(alignment: .leading, spacing: 10) {
@@ -326,7 +296,7 @@ struct WeatherGridView: View {
                     Divider()
                         .background(Color.white.opacity(0.7))
                     Spacer()
-                    Text(String(format: "%.2f", viewModel.weatherData?.current.uvi ?? 0))
+                    Text(String(viewModel.weatherData?.current.uvi ?? 0))
                         .font(.system(size: 22, weight: .bold))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
@@ -334,12 +304,7 @@ struct WeatherGridView: View {
                     Spacer()
                 }
                 .padding()
-                .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(LinearGradient(gradient: Gradient(colors: [Color.blue, Color.blue.opacity(0.7)]),
-                                             startPoint: .top, endPoint: .bottom))
-                        .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 5)
-                )
+                .background(.ultraThinMaterial).cornerRadius(16)
                 VStack(alignment: .leading, spacing: 10) {
                     HStack {
                         Image(systemName: "cloud.fill")
@@ -353,7 +318,7 @@ struct WeatherGridView: View {
                     Divider()
                         .background(Color.white.opacity(0.7))
                     Spacer()
-                    Text(String(format: "%.2f", viewModel.weatherData?.current.clouds ?? 0))
+                    Text(String(viewModel.weatherData?.current.clouds ?? Int(0.0)))
                         .font(.system(size: 22, weight: .bold))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
@@ -361,12 +326,39 @@ struct WeatherGridView: View {
                     Spacer()
                 }
                 .padding()
-                .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(LinearGradient(gradient: Gradient(colors: [Color.blue, Color.blue.opacity(0.7)]),
-                                             startPoint: .top, endPoint: .bottom))
-                        .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 5)
-                )
+                .background(.ultraThinMaterial).cornerRadius(16)
+            }
+            GridRow {
+                HStack{
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack {
+                            Text("Atmospheric Pressure")
+                                .padding(.horizontal)
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundColor(.white)
+                            Spacer()
+                        }
+                        Divider()
+                            .background(Color.white.opacity(0.7))
+                        // Display the wind direction text
+                        HStack{
+                            Image(systemName: "tachometer")
+                                .foregroundColor(.white.opacity(0.7))
+                                .font(.system(size: 60))
+                                .padding()
+                            Text("\(viewModel.weatherData?.current.pressure ?? 0) hPa")
+                                .font(.system(size: 22, weight: .bold))
+                                .foregroundColor(.white)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal)
+                                
+                            Spacer()
+                        }
+                    }
+                    .padding()
+                }
+                .gridCellColumns(2)
+                .background(.ultraThinMaterial).cornerRadius(16)
             }
         }
     }

@@ -12,59 +12,41 @@ struct FavouritesView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                LazyVStack(spacing: 16) { // Lazy loading for better performance
-                    ForEach(viewModel.favouriteCities) { city in
-                        HStack {
-                            Text(city.cityName)
-                                .frame(maxWidth: .infinity, alignment: .leading) // Ensure city name takes full space
-                                .padding(.vertical, 8)
-                            
-                            Button {
-                                Task {
-                                    await viewModel.getCityWeatherFromAPI(coordinate: city.cityCoordinates)
-                                    await MainActor.run {
-                                        selectedTab = .home // Navigate to Home tab
-                                    }
+            List {
+                ForEach(viewModel.favouriteCities) { city in
+                    HStack {
+                        Text(city.cityName)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        Button {
+                            Task {
+                                await viewModel.getCityWeatherFromAPI(coordinate: city.cityCoordinates)
+                                await MainActor.run {
+                                    selectedTab = .home
                                 }
-                            } label: {
-                                Image(systemName: "cloud.sun")
-                                    .foregroundColor(.blue)
-                                    .padding()
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 8)
-                                            .stroke(Color.blue, lineWidth: 2)
-                                    )
                             }
-                            .contentShape(Rectangle()) // Avoid overlapping tap gestures
-                            
-                            Button {
-                                viewModel.favouriteCities.removeAll(where: { $0.cityName == city.cityName })
-                            } label: {
-                                Image(systemName: "xmark.circle")
-                                    .foregroundColor(.red)
-                                    .padding()
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 8)
-                                            .stroke(Color.red, lineWidth: 2)
-                                    )
-                            }
-                            .contentShape(Rectangle()) // Ensure button-only interaction
+                        } label: {
+                            Image(systemName: "cloud.sun")
+                                .foregroundStyle(Color.white)
                         }
-                        .padding(.horizontal)
-                        .background(
-                            RoundedRectangle(cornerRadius: 8)
-                                .fill(Color.gray.opacity(0.1)) // Light background for separation
-                        )
+                        .padding()
+                        .buttonStyle(.borderedProminent)
+                        Button {
+                            viewModel.favouriteCities.removeAll(where: { $0.cityName == city.cityName })
+                        } label: {
+                            Image(systemName: "xmark")
+                            .foregroundStyle(Color.red)
+                            .font(.system(size: 12))
+                        }
                     }
                 }
-                .padding(.vertical)
             }
             .navigationTitle("Favourites View")
             .navigationBarTitleDisplayMode(.inline)
         }
     }
 }
+
 #Preview {
     FavouritesView(selectedTab: .constant(Tab.favourites))
         .environmentObject(ViewModel())
