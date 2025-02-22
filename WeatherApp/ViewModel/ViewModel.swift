@@ -35,7 +35,7 @@ class ViewModel: NSObject,ObservableObject, CLLocationManagerDelegate {
     private var funcLocationManager = CLLocationManager()
     
     //API call constants
-    let APIKey = "841d2244be17c810ea7de37ff784415b"
+    let APIKey = "API_KEY"
     let baseURL = "https://api.openweathermap.org/data/3.0/onecall?"
     let airQualitybaseURL = "https://api.openweathermap.org/data/2.5/air_pollution?"
     
